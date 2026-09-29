@@ -4,6 +4,10 @@ import DiscordActivity from "../components/DiscordActivity";
 import { cn, getDiscordAvatarUrl } from "@/lib/utils";
 import GradientBackground from "@/components/GradientBackground";
 
+import type { CSSProperties } from "react";
+import { useDiscordStatus } from "@/hooks/useDiscordStatus";
+import { DISCORD_STATUS_COLORS } from "@/lib/utils";
+
 // TODO: replace with your real details
 const NAME = "Sereno";
 const TAGLINE = "";
@@ -18,10 +22,16 @@ export default function Home() {
 		document.title = NAME;
 	}, []);
 
+	const status = useDiscordStatus(DISCORD_ID);
+	const avatarStyle =
+		status ?
+			({ "--status-color": DISCORD_STATUS_COLORS[status] } as CSSProperties)
+		:	undefined;
+
 	return (
 		<div className="home">
 			{/* Layer 0 – background */}
-      <GradientBackground animated />
+			<GradientBackground animated />
 			{/* Layer 1 – blur */}
 			<div
 				className="layer-blur"
@@ -34,21 +44,22 @@ export default function Home() {
 						className="avatar"
 						src={avatar}
 						alt={`${NAME} profile picture`}
+						style={avatarStyle}
 					/>
 				:	<div
 						className="avatar avatar-fallback"
-						aria-hidden="true">
+						aria-hidden="true"
+						style={avatarStyle}>
 						{NAME[0].toUpperCase()}
+						
 					</div>
 				}
-
-				
 
 				<h1 className="name">{NAME}</h1>
 				<p className="tagline">{TAGLINE}</p>
 
 				<SocialLinks />
-        <DiscordActivity userId={DISCORD_ID} />
+				<DiscordActivity userId={DISCORD_ID} />
 			</main>
 		</div>
 	);

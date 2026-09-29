@@ -82,3 +82,24 @@ export function getApplicationIconUrl(applicationId: string, size = 256): Promis
   }
   return request;
 }
+
+export type DiscordStatus = "online" | "idle" | "dnd" | "offline";
+
+export const DISCORD_STATUS_COLORS: Record<DiscordStatus, string> = {
+  online: "#23a55a",  // green
+  idle: "#f0b232",    // yellow
+  dnd: "#f23f43",     // red
+  offline: "#80848e", // gray (also shown for invisible)
+};
+
+/** Current Discord status, or null if the request failed. */
+export async function getDiscordStatus(userId: string): Promise<DiscordStatus | null> {
+  try {
+    const res = await fetch(`https://api.lanyard.rest/v1/users/${userId}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.success ? (json.data.discord_status as DiscordStatus) : null;
+  } catch {
+    return null;
+  }
+}
