@@ -70,6 +70,7 @@ export default function SocialLinks() {
 							}
 							{...(external ? { target: "_blank", rel: "noreferrer" } : {})}>
 							<Icon aria-hidden="true" />
+							<span className="social-name">{text}</span>
 						</a>
 					</li>
 				);
