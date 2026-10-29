@@ -57,12 +57,33 @@ async function getText(url: string) {
 	return res.text();
 }
 
+/**
+ * YouTube keeps a hidden playlist per channel that holds only regular videos:
+ * "UULF" + the channel ID without its "UC" prefix. Unlike the channel's main
+ * feed, it leaves out live streams, scheduled streams, premieres and Shorts.
+ */
+const videosPlaylistId = (channelId: string) => `UULF${channelId.slice(2)}`;
+
+async function getFeed(url: string) {
+	const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(15_000) });
+	if (res.status === 404) return null; // playlist does not exist: the channel has no regular videos
+	if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+	return res.text();
+}
+
 async function loadChannel(id: string, previous?: Channel): Promise<Channel | null> {
 	try {
-		const feed = parseFeed(
-			await getText(`https://www.youtube.com/feeds/videos.xml?channel_id=${id}`),
-			VIDEOS_PER_CHANNEL,
+		const xml = await getFeed(
+			`https://www.youtube.com/feeds/videos.xml?playlist_id=${videosPlaylistId(id)}`,
 		);
+		let feed: Pick<Channel, "name" | "videos">;
+		if (xml) {
+			feed = parseFeed(xml, VIDEOS_PER_CHANNEL);
+		} else {
+			// No regular videos at all. Read the main feed only to get the channel name.
+			const main = await getFeed(`https://www.youtube.com/feeds/videos.xml?channel_id=${id}`);
+			feed = { name: main ? parseFeed(main, 0).name : "", videos: [] };
+		}
 		if (!feed.name) throw new Error("feed has no channel name");
 
 		// The avatar is not in the feed, so read it from the channel page.

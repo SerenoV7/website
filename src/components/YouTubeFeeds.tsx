@@ -50,7 +50,9 @@ function ChannelFeed({ channel }: { channel: Channel }) {
 				</a>
 			</header>
 
-			<ul className="yt-videos">
+			{channel.videos.length === 0 ?
+				<p className="yt-empty">Currently no videos</p>
+			:	<ul className="yt-videos">
 				{channel.videos.map((video) => (
 					<li key={video.id}>
 						<a
@@ -76,6 +78,7 @@ function ChannelFeed({ channel }: { channel: Channel }) {
 					</li>
 				))}
 			</ul>
+			}
 		</section>
 	);
 }

@@ -92,7 +92,9 @@ main { max-width: 48rem; margin: 0 auto; padding: 2rem 1.25rem; min-height: 60vh
 
 
 /* ---------- YouTube feeds ---------- */
-.yt-feeds { display: flex; flex-direction: column; gap: 1rem; width: min(25rem, 100%); margin-top: 0.5rem; }
+.yt-feeds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 1rem; width: min(72rem, 100%); margin-top: 0.5rem; }
+.yt-empty { margin: 0; padding: 0.6rem 0.3rem; font-size: 0.9rem; opacity: 0.7; }
+@media (max-width: 900px) { .yt-feeds { grid-template-columns: 1fr; width: min(25rem, 100%); } }
 .yt-feed {
   text-align: left; padding: 0.8rem; border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05);
