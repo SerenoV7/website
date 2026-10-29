@@ -90,6 +90,32 @@ main { max-width: 48rem; margin: 0 auto; padding: 2rem 1.25rem; min-height: 60vh
 .activity-name { font-weight: 900; }
 .activity-line { font-size: 0.95rem; opacity: 1; }
 
+
+/* ---------- YouTube feeds ---------- */
+.yt-feeds { display: flex; flex-direction: column; gap: 1rem; width: min(25rem, 100%); margin-top: 0.5rem; }
+.yt-feed {
+  text-align: left; padding: 0.8rem; border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.yt-header { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.7rem; }
+.yt-avatar { flex: none; width: 2.6rem; height: 2.6rem; border-radius: 50%; object-fit: cover; }
+.yt-avatar-fallback { display: grid; place-items: center; font-weight: 700; background: rgba(255, 255, 255, 0.14); }
+.yt-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; color: #fff; }
+.yt-subscribe {
+  flex: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem;
+  border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #fff; background: #e62117;
+  transition: transform 0.15s, filter 0.15s;
+}
+.yt-subscribe:hover, .yt-subscribe:focus-visible { transform: translateY(-1px); filter: brightness(1.1); text-decoration: none; }
+.yt-videos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.yt-video { display: flex; align-items: center; gap: 0.7rem; padding: 0.3rem; border-radius: 0.7rem; color: #fff; transition: background-color 0.2s; }
+.yt-video:hover, .yt-video:focus-visible { background: rgba(255, 255, 255, 0.1); text-decoration: none; }
+.yt-thumb { flex: none; width: 6.4rem; aspect-ratio: 16 / 9; border-radius: 0.5rem; object-fit: cover; background: rgba(255, 255, 255, 0.08); }
+.yt-video-text { min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+.yt-video-title { font-size: 0.9rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.yt-video-date { font-size: 0.75rem; opacity: 0.7; }
+
 @property --gx { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
 @property --gs { syntax: "<percentage>"; inherits: false; initial-value: 100%; }
 
@@ -198,6 +224,7 @@ main { max-width: 48rem; margin: 0 auto; padding: 2rem 1.25rem; min-height: 60vh
   /* Order: avatar → name → tagline → Discord activity → socials */
   .activities { order: 1; width: min(22rem, 100%); }
   .socials    { order: 2; }
+  .yt-feeds   { order: 3; width: min(22rem, 100%); }
 
   /* Socials: one button per row */
   .socials {

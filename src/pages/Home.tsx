@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SocialLinks from "../components/SocialLinks";
 import DiscordActivity from "../components/DiscordActivity";
+import YouTubeFeeds from "../components/YouTubeFeeds";
 import { cn, getDiscordAvatarUrl } from "@/lib/utils";
 import GradientBackground from "@/components/GradientBackground";
 
@@ -60,6 +61,7 @@ export default function Home() {
 
 				<SocialLinks />
 				<DiscordActivity userId={DISCORD_ID} />
+				<YouTubeFeeds />
 			</main>
 		</div>
 	);
