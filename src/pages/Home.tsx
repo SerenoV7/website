@@ -59,8 +59,8 @@ export default function Home() {
 				<h1 className="name">{NAME}</h1>
 				<p className="tagline">{TAGLINE}</p>
 
-				<SocialLinks />
 				<DiscordActivity userId={DISCORD_ID} />
+				<SocialLinks />
 				<YouTubeFeeds />
 			</main>
 		</div>
