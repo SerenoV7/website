@@ -1,10 +1,7 @@
 import { useEffect } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
-const links = [
-  { to: "/", label: "Home", end: true },
-];
-
+/** Shared wrapper for every page except Home. Each page renders its own <main>. */
 export default function Layout() {
   const { pathname } = useLocation();
 
@@ -13,11 +10,5 @@ export default function Layout() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  return (
-    <>
-      <main>
-        <Outlet />
-      </main>
-    </>
-  );
+  return <Outlet />;
 }

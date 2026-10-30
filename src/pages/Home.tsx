@@ -3,7 +3,7 @@ import SocialLinks from "../components/SocialLinks";
 import DiscordActivity from "../components/DiscordActivity";
 import YouTubeFeeds from "../components/YouTubeFeeds";
 import { cn, getDiscordAvatarUrl } from "@/lib/utils";
-import GradientBackground from "@/components/GradientBackground";
+import Backdrop from "@/components/Backdrop";
 
 import type { CSSProperties } from "react";
 import { useDiscordStatus } from "@/hooks/useDiscordStatus";
@@ -32,12 +32,7 @@ export default function Home() {
 	return (
 		<div className="home">
 			{/* Layer 0 – background */}
-			<GradientBackground animated />
-			{/* Layer 1 – blur */}
-			<div
-				className="layer-blur"
-				aria-hidden="true"
-			/>
+			<Backdrop />
 			{/* Layer 2 – content */}
 			<main className="layer-content">
 				{avatar ?
@@ -57,7 +52,7 @@ export default function Home() {
 				}
 
 				<h1 className="name">{NAME}</h1>
-				<p className="tagline">{TAGLINE}</p>
+				{TAGLINE && <p className="tagline">{TAGLINE}</p>}
 
 				<DiscordActivity userId={DISCORD_ID} />
 				<SocialLinks />
