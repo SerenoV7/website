@@ -35,7 +35,10 @@ const pick = (xml: string, tag: string) =>
 export function parseFeed(xml: string, limit: number): Pick<Channel, "name" | "videos"> {
 	const entries = xml.split("<entry>").slice(1);
 	const head = xml.split("<entry>")[0];
-	const name = decode(pick(pick(head, "author"), "name"));
+	// The name is usually in the feed's header, but not always: fall back to
+	// the author of the first video.
+	const authorName = (part: string) => decode(pick(pick(part, "author"), "name")).trim();
+	const name = authorName(head) || authorName(entries[0] ?? "");
 	const videos = entries.slice(0, limit).map((entry) => ({
 		id: pick(entry, "yt:videoId"),
 		title: decode(pick(entry, "title")),
@@ -49,6 +52,11 @@ export function parseAvatar(html: string): string | null {
 	if (!match) return null;
 	// Request a small square version instead of the full-size image.
 	return decode(match[1]).replace(/=s\d+.*$/, "=s176-c-k-c0x00ffffff-no-rj");
+}
+
+export function parseChannelName(html: string): string {
+	const match = html.match(/<meta property="og:title" content="([^"]+)"/);
+	return match ? decode(match[1]).trim() : "";
 }
 
 async function getText(url: string) {
@@ -76,24 +84,31 @@ async function loadChannel(id: string, previous?: Channel): Promise<Channel | nu
 		const xml = await getFeed(
 			`https://www.youtube.com/feeds/videos.xml?playlist_id=${videosPlaylistId(id)}`,
 		);
-		let feed: Pick<Channel, "name" | "videos">;
-		if (xml) {
-			feed = parseFeed(xml, VIDEOS_PER_CHANNEL);
-		} else {
-			// No regular videos at all. Read the main feed only to get the channel name.
-			const main = await getFeed(`https://www.youtube.com/feeds/videos.xml?channel_id=${id}`);
-			feed = { name: main ? parseFeed(main, 0).name : "", videos: [] };
+		const feed = xml ? parseFeed(xml, VIDEOS_PER_CHANNEL) : { name: "", videos: [] };
+		if (xml && feed.videos.length === 0) {
+			// 200 response but nothing we recognise (an error or consent page, say).
+			console.warn(`[youtube] ${id}: unexpected feed, starts with: ${xml.slice(0, 200).replace(/\s+/g, " ")}`);
 		}
-		if (!feed.name) throw new Error("feed has no channel name");
 
-		// The avatar is not in the feed, so read it from the channel page.
+		// The channel page gives us the avatar, and the name if the feed had none.
 		let avatar = previous?.avatar ?? null;
+		let name = feed.name;
 		try {
-			avatar = parseAvatar(await getText(`https://www.youtube.com/channel/${id}`)) ?? avatar;
+			const page = await getText(`https://www.youtube.com/channel/${id}`);
+			avatar = parseAvatar(page) ?? avatar;
+			name ||= parseChannelName(page);
 		} catch (error) {
-			console.warn(`[youtube] ${id}: avatar not updated (${error})`);
+			console.warn(`[youtube] ${id}: channel page not read (${error})`);
 		}
-		return { id, ...feed, avatar };
+		// Last resort for the name: the main feed, which always has it in the header.
+		if (!name) {
+			const main = await getFeed(`https://www.youtube.com/feeds/videos.xml?channel_id=${id}`);
+			name = main ? parseFeed(main, 0).name : "";
+		}
+		name ||= previous?.name ?? "";
+		if (!name) throw new Error("could not find the channel name in the feed or on the channel page");
+
+		return { id, name, videos: feed.videos, avatar };
 	} catch (error) {
 		console.warn(`[youtube] ${id}: ${error}`);
 		return previous ?? null;
